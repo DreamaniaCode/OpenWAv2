@@ -12,8 +12,6 @@ services:
       - '127.0.0.1:${DASHBOARD_PORT:-2886}:80'
       - '127.0.0.1:8080:8080' # Traefik dashboard
     volumes:
-      - ./traefik/traefik.yml:/etc/traefik/traefik.yml:ro
-      - ./traefik/dynamic.yml:/etc/traefik/dynamic.yml:ro
     labels:
       - 'com.openwa.service=proxy'
       - 'com.openwa.core=true'
@@ -73,7 +71,6 @@ services:
     volumes:
       - openwa-data:/app/data
       - /var/run/docker.sock:/var/run/docker.sock:ro
-      - ./docker-compose.yml:/app/docker-compose.yml:ro
     depends_on:
       postgres:
         condition: service_healthy
