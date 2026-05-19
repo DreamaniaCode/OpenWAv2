@@ -1,7 +1,7 @@
 services:
   # ===== CORE: OpenWA Backend API =====
   openwa-api:
-    image: rmyndharis/openwa-api:latest
+    image: openwa/wa-automate:latest
     container_name: openwa-api
     restart: unless-stopped
     ports:
@@ -9,19 +9,13 @@ services:
     environment:
       - NODE_ENV=production
       - PORT=2785
-      - DATABASE_TYPE=sqlite
-      - DATABASE_NAME=/app/data/openwa.sqlite
-      - DATABASE_SYNCHRONIZE=true
       - API_MASTER_KEY=owa_abcdef1234567890abcdef1234567890
     volumes:
       - openwa-data:/app/data
-    labels:
-      - 'com.openwa.service=api'
-      - 'com.openwa.core=true'
 
   # ===== CORE: Dashboard Frontend =====
   dashboard:
-    image: rmyndharis/openwa-dashboard:latest
+    image: openwa/wa-automate-dashboard:latest
     container_name: openwa-dashboard
     restart: unless-stopped
     ports:
@@ -30,9 +24,6 @@ services:
       - VITE_API_URL=https://wa-api.myskillscloud.com
     depends_on:
       - openwa-api
-    labels:
-      - 'com.openwa.service=dashboard'
-      - 'com.openwa.core=true'
 
 volumes:
   openwa-data:
