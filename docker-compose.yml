@@ -30,7 +30,7 @@ services:
       - STORAGE_TYPE=local
       - STORAGE_LOCAL_PATH=/app/data/media
       # Hardcoded Security Key
-      - API_MASTER_KEY=SkillsCloud2026
+      - API_MASTER_KEY=owa_abcdef1234567890abcdef1234567890
     volumes:
       - openwa-data:/app/data
       - /var/run/docker.sock:/var/run/docker.sock:ro
