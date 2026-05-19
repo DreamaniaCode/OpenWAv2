@@ -51,19 +51,15 @@ services:
       - 'com.openwa.core=true'
 
   # ===== CORE: Dashboard Frontend =====
+ # ===== CORE: Dashboard Frontend =====
   dashboard:
-    build:
-      context: ./dashboard
-      dockerfile: Dockerfile.traefik
-      # This 'args' block is the magic fix for the frontend bug
-      args:
-        - VITE_API_URL=https://wa-api.myskillscloud.com
+    image: rmyndharis/openwa-dashboard:latest
     container_name: openwa-dashboard
     restart: unless-stopped
     expose:
       - '80'
     environment:
-      - NODE_ENV=development
+      - NODE_ENV=production
       - VITE_API_URL=https://wa-api.myskillscloud.com
     depends_on:
       - openwa-api
