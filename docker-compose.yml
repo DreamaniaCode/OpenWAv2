@@ -1,71 +1,36 @@
-# OpenWA - Docker Compose Configuration Optimized for Coolify
-
 services:
   # ===== CORE: OpenWA Backend API =====
   openwa-api:
-    build:
-      context: .
-      dockerfile: Dockerfile
+    image: node:20-alpine
     container_name: openwa-api
     restart: unless-stopped
+    working_dir: /app
+    # Use a command that installs and runs directly to avoid build-time errors
+    command: sh -c "npm install && npm start"
     ports:
-      - '127.0.0.1:${API_PORT:-2785}:2785'
-    expose:
-      - '2785'
+      - '2785:2785'
     environment:
-      # Core Environment Variables
-      - NODE_ENV=development
+      - NODE_ENV=production
       - PORT=2785
-      - LOG_LEVEL=info
-      # Bypassing locked profiles by forcing SQLite
       - DATABASE_TYPE=sqlite
       - DATABASE_NAME=/app/data/openwa.sqlite
       - DATABASE_SYNCHRONIZE=true
-      # WhatsApp Engine Configuration
-      - ENGINE_TYPE=whatsapp-web.js
-      - SESSION_DATA_PATH=/app/data/sessions
-      - PUPPETEER_HEADLESS=true
-      - PUPPETEER_ARGS=--no-sandbox,--disable-setuid-sandbox,--disable-dev-shm-usage,--disable-gpu
-      # Local Storage
-      - STORAGE_TYPE=local
-      - STORAGE_LOCAL_PATH=/app/data/media
-      # Hardcoded Security Key
       - API_MASTER_KEY=owa_abcdef1234567890abcdef1234567890
     volumes:
+      - .:/app
       - openwa-data:/app/data
-      - /var/run/docker.sock:/var/run/docker.sock:ro
-    healthcheck:
-      test:
-        [
-          'CMD',
-          'node',
-          '-e',
-          "require('http').get('http://localhost:2785/api/health', (r) => process.exit(r.statusCode === 200 ? 0 : 1))",
-        ]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-      start_period: 30s
-    labels:
-      - 'com.openwa.service=api'
-      - 'com.openwa.core=true'
 
   # ===== CORE: Dashboard Frontend =====
- # ===== CORE: Dashboard Frontend =====
   dashboard:
-    image: rmyndharis/openwa-dashboard:latest
+    image: nginx:alpine
     container_name: openwa-dashboard
     restart: unless-stopped
-    expose:
-      - '80'
-    environment:
-      - NODE_ENV=production
-      - VITE_API_URL=https://wa-api.myskillscloud.com
+    ports:
+      - '80:80'
+    volumes:
+      - ./dashboard/dist:/usr/share/nginx/html:ro
     depends_on:
       - openwa-api
-    labels:
-      - 'com.openwa.service=dashboard'
-      - 'com.openwa.core=true'
 
 volumes:
   openwa-data:
