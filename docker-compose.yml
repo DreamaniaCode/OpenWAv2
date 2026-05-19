@@ -13,33 +13,23 @@ services:
     expose:
       - '2785'
     environment:
-      # Core (Forced to development to install required compilers during build)
-      - NODE_ENV=${NODE_ENV:-development}
+      # Core Environment Variables
+      - NODE_ENV=development
       - PORT=2785
-      - LOG_LEVEL=${LOG_LEVEL:-info}
-      # Database (Configured to use built-in SQLite to prevent database connection crashes)
+      - LOG_LEVEL=info
+      # Bypassing locked profiles by forcing SQLite
       - DATABASE_TYPE=sqlite
       - DATABASE_NAME=/app/data/openwa.sqlite
       - DATABASE_SYNCHRONIZE=true
-      # Engine
-      - ENGINE_TYPE=${ENGINE_TYPE:-whatsapp-web.js}
+      # WhatsApp Engine Configuration
+      - ENGINE_TYPE=whatsapp-web.js
       - SESSION_DATA_PATH=/app/data/sessions
-      - PUPPETEER_HEADLESS=${PUPPETEER_HEADLESS:-true}
-      - PUPPETEER_ARGS=${PUPPETEER_ARGS:---no-sandbox,--disable-setuid-sandbox,--disable-dev-shm-usage,--disable-gpu}
-      # Storage
-      - STORAGE_TYPE=${STORAGE_TYPE:-local}
+      - PUPPETEER_HEADLESS=true
+      - PUPPETEER_ARGS=--no-sandbox,--disable-setuid-sandbox,--disable-dev-shm-usage,--disable-gpu
+      # Local Storage
+      - STORAGE_TYPE=local
       - STORAGE_LOCAL_PATH=/app/data/media
-      # Webhook
-      - WEBHOOK_TIMEOUT=${WEBHOOK_TIMEOUT:-10000}
-      - WEBHOOK_MAX_RETRIES=${WEBHOOK_MAX_RETRIES:-3}
-      - WEBHOOK_RETRY_DELAY=${WEBHOOK_RETRY_DELAY:-5000}
-      # Rate Limit
-      - RATE_LIMIT_TTL=${RATE_LIMIT_TTL:-60}
-      - RATE_LIMIT_MAX=${RATE_LIMIT_MAX:-100}
-      # Plugins
-      - PLUGINS_ENABLED=${PLUGINS_ENABLED:-true}
-      - PLUGINS_DIR=/app/data/plugins
-      # Security
+      # Hardcoded Security Key
       - API_MASTER_KEY=SkillsCloud2026
     volumes:
       - openwa-data:/app/data
@@ -65,12 +55,15 @@ services:
     build:
       context: ./dashboard
       dockerfile: Dockerfile.traefik
+      # This 'args' block is the magic fix for the frontend bug
+      args:
+        - VITE_API_URL=https://wa-api.myskillscloud.com
     container_name: openwa-dashboard
     restart: unless-stopped
     expose:
       - '80'
     environment:
-      - NODE_ENV=${NODE_ENV:-development}
+      - NODE_ENV=development
       - VITE_API_URL=https://wa-api.myskillscloud.com
     depends_on:
       - openwa-api
