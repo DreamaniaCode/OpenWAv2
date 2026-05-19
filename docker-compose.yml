@@ -1,12 +1,9 @@
 services:
   # ===== CORE: OpenWA Backend API =====
   openwa-api:
-    image: node:20-alpine
+    image: rmyndharis/openwa-api:latest
     container_name: openwa-api
     restart: unless-stopped
-    working_dir: /app
-    # Use a command that installs and runs directly to avoid build-time errors
-    command: sh -c "npm install && npm start"
     ports:
       - '2785:2785'
     environment:
@@ -17,20 +14,25 @@ services:
       - DATABASE_SYNCHRONIZE=true
       - API_MASTER_KEY=owa_abcdef1234567890abcdef1234567890
     volumes:
-      - .:/app
       - openwa-data:/app/data
+    labels:
+      - 'com.openwa.service=api'
+      - 'com.openwa.core=true'
 
   # ===== CORE: Dashboard Frontend =====
   dashboard:
-    image: nginx:alpine
+    image: rmyndharis/openwa-dashboard:latest
     container_name: openwa-dashboard
     restart: unless-stopped
     ports:
-      - '80:80'
-    volumes:
-      - ./dashboard/dist:/usr/share/nginx/html:ro
+      - '2886:80'
+    environment:
+      - VITE_API_URL=https://wa-api.myskillscloud.com
     depends_on:
       - openwa-api
+    labels:
+      - 'com.openwa.service=dashboard'
+      - 'com.openwa.core=true'
 
 volumes:
   openwa-data:
